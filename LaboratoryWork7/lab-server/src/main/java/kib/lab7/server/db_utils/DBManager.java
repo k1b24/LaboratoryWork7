@@ -1,0 +1,187 @@
+package kib.lab7.server.db_utils;
+
+import kib.lab7.common.entities.HumanBeing;
+import kib.lab7.common.util.console_workers.ErrorMessage;
+import kib.lab7.server.utils.Config;
+
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Types;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+public class DBManager {
+
+    private final DBConnector dbConnector = new DBConnector();
+
+    public boolean checkIfUserRegistered(String username, String password) {
+        try {
+            String query = DBQueries.FIND_USER_BY_LOG_AND_PASS.getQuery();
+            PreparedStatement statement = dbConnector.getConnection().prepareStatement(query);
+            statement.setString(1, username);
+            statement.setString(2, password);
+            ResultSet rs = statement.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Config.getTextSender().printMessage(new ErrorMessage("Произошла ошибка при работе с базой данных при проверке зарегистрированного пользователя"));
+            return false;
+        }
+    }
+
+    public boolean registerNewUser(String userLogin, String userPassword) {
+        try {
+            String query = DBQueries.ADD_USER.getQuery();
+            PreparedStatement statement = dbConnector.getConnection().prepareStatement(query);
+            statement.setString(1, userLogin);
+            statement.setString(2, userPassword);
+            statement.executeUpdate();
+            return true;
+        } catch (SQLException e) {
+            Config.getTextSender().printMessage(new ErrorMessage("Произошла ошибка при работе с базой данных при добавлении нового пользователя"));
+            return false;
+        }
+    }
+
+    public Long[] clearByUserName(String userLogin) {
+        String query = DBQueries.CLEAR_ALL_HUMAN_BEINGS_BY_USER.getQuery();
+        try {
+            PreparedStatement statement = dbConnector.getConnection().prepareStatement(query);
+            statement.setString(1, userLogin);
+            ResultSet rs = statement.executeQuery();
+            List<Long> result = new ArrayList<>();
+            while (rs.next()) {
+                result.add(rs.getLong("id"));
+            }
+            Long[] ids = new Long[result.size()];
+            ids = result.toArray(ids);
+            return ids;
+        } catch (SQLException e) {
+            Config.getTextSender().printMessage(new ErrorMessage("Произошла ошибка при работе с базой данных при удалении всех экземпляров одного пользователя"));
+            return null;
+        }
+
+    }
+
+    public long clearByIdAndUserName(long id, String userName) {
+        String query = DBQueries.DELETE_HUMAN_BEING_BY_ID.getQuery();
+        try {
+            PreparedStatement statement = dbConnector.getConnection().prepareStatement(query);
+            statement.setLong(1, id);
+            statement.setString(2, userName);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getLong("id");
+            } else {
+                return 0;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Config.getTextSender().printMessage(new ErrorMessage("Произошла ошибка при удалении человека "));
+            return -1;
+        }
+    }
+
+    public long addHumanBeingToDB(HumanBeing human) {
+        try {
+            String query = DBQueries.ADD_HUMAN_BEING_TO_DB.getQuery();
+            PreparedStatement statement = dbConnector.getConnection().prepareStatement(query);
+            long id = generateId();
+            int paramCounter = 1;
+            statement.setLong(paramCounter++, id);
+            statement.setString(paramCounter++, human.getName());
+            statement.setLong(paramCounter++, human.getCoordinates().getX());
+            statement.setFloat(paramCounter++, human.getCoordinates().getY());
+            statement.setDate(paramCounter++, Date.valueOf(LocalDate.now()));
+            statement.setBoolean(paramCounter++, human.isRealHero());
+            statement.setBoolean(paramCounter++, human.isHasToothpick());
+            statement.setInt(paramCounter++, human.getImpactSpeed());
+            if (human.getWeaponType() != null) {
+                statement.setString(paramCounter++, String.valueOf(human.getWeaponType()));
+            } else {
+                statement.setNull(paramCounter++, Types.VARCHAR);
+            }
+            if (human.getMood() != null) {
+                statement.setString(paramCounter++, String.valueOf(human.getMood()));
+            } else {
+                statement.setNull(paramCounter++, Types.VARCHAR);
+            }
+            if (human.getCar() != null) {
+                statement.setBoolean(paramCounter++, human.getCar().getCarCoolness());
+                statement.setInt(paramCounter++, human.getCar().getCarSpeed());
+            } else {
+                statement.setNull(paramCounter++, Types.BOOLEAN);
+                statement.setNull(paramCounter++, Types.INTEGER);
+            }
+            statement.setString(paramCounter, human.getAuthor());
+            statement.executeUpdate();
+            return id;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Config.getTextSender().printMessage(new ErrorMessage("Произошла ошибка при работе с базой данных при добавлении нового HumanBeing"));
+            return -1;
+        }
+    }
+
+    private long generateId() {
+        try {
+            Statement statement = dbConnector.getConnection().createStatement();
+            ResultSet rs = statement.executeQuery(DBQueries.GENERATE_NEXT_ID.getQuery());
+            if (rs.next()) {
+                return rs.getInt("nextval");
+            } else {
+                return -1;
+            }
+        } catch (SQLException e) {
+            Config.getTextSender().printMessage(new ErrorMessage("Возникла ошибка при генерации нового ID"));
+            return -1;
+        }
+    }
+
+    public long updateByIdAndUser(HumanBeing human, long id, String user) {
+        String query = DBQueries.UPDATE_BY_ID_AND_USER.getQuery();
+        try {
+            PreparedStatement statement = dbConnector.getConnection().prepareStatement(query);
+            int paramCounter = 1;
+            statement.setString(paramCounter++, human.getName());
+            statement.setLong(paramCounter++, human.getCoordinates().getX());
+            statement.setFloat(paramCounter++, human.getCoordinates().getY());
+            statement.setDate(paramCounter++, Date.valueOf(LocalDate.now()));
+            statement.setBoolean(paramCounter++, human.isRealHero());
+            statement.setBoolean(paramCounter++, human.isHasToothpick());
+            statement.setInt(paramCounter++, human.getImpactSpeed());
+            if (human.getWeaponType() != null) {
+                statement.setString(paramCounter++, String.valueOf(human.getWeaponType()));
+            } else {
+                statement.setNull(paramCounter++, Types.VARCHAR);
+            }
+            if (human.getMood() != null) {
+                statement.setString(paramCounter++, String.valueOf(human.getMood()));
+            } else {
+                statement.setNull(paramCounter++, Types.VARCHAR);
+            }
+            if (human.getCar() != null) {
+                statement.setBoolean(paramCounter++, human.getCar().getCarCoolness());
+                statement.setInt(paramCounter++, human.getCar().getCarSpeed());
+            } else {
+                statement.setNull(paramCounter++, Types.BOOLEAN);
+                statement.setNull(paramCounter++, Types.INTEGER);
+            }
+            statement.setLong(paramCounter++, id);
+            statement.setString(paramCounter, user);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                return rs.getLong("id");
+            } else {
+                return 0;
+            }
+        } catch (SQLException e) {
+            Config.getTextSender().printMessage(new ErrorMessage("Возникла ошибка при обновленнии пользователя по ID"));
+            return -1;
+        }
+    }
+}
