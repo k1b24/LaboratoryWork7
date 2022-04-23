@@ -2,7 +2,6 @@ package kib.lab7.client;
 
 import kib.lab7.common.abstractions.RequestInterface;
 import kib.lab7.common.abstractions.ResponseInterface;
-import kib.lab7.common.util.client_server_communication.responses.CommandResponse;
 import kib.lab7.common.util.client_server_communication.Serializer;
 
 import java.io.IOException;

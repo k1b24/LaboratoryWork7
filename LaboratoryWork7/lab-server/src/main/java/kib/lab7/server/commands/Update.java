@@ -16,12 +16,11 @@ public class Update extends AbstractCommand {
 
     @Override
     public Object execute(CommandRequest request) {
-        //TODO перепесиать на получение айди а не тру и фолс
         long id = request.getNumberArgumentToSend();
         long returnedId = super.getDataManager().updateByIdAndUser(request.getHumanToSend(), id, request.getUserLogin());
         if (returnedId > 0) {
             return new CommandResponse(new SuccessMessage("Человек с id " + returnedId + "был обновлен"));
-        } else if (returnedId == 0){
+        } else if (returnedId == 0) {
             return new CommandResponse(new ErrorMessage("Человек не был обновлен, он вам не принадлежит"));
         } else {
             return new CommandResponse(new ErrorMessage("Человек не был обновлен, произошла ошибка при работе с базой данных"));

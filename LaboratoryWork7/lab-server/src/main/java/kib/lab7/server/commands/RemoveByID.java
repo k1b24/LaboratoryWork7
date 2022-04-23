@@ -4,7 +4,6 @@ import kib.lab7.common.util.client_server_communication.requests.CommandRequest;
 import kib.lab7.common.util.client_server_communication.responses.CommandResponse;
 import kib.lab7.common.util.console_workers.ErrorMessage;
 import kib.lab7.common.util.console_workers.SuccessMessage;
-import kib.lab7.server.utils.Config;
 import kib.lab7.server.abstractions.AbstractCommand;
 import kib.lab7.server.utils.DataManager;
 

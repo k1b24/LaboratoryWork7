@@ -28,16 +28,18 @@ public class CommandManager {
     private static final int AMOUNT_OF_COMMANDS_TO_SAVE = 10;
     private final Map<String, AbstractCommand> commands = new HashMap<>();
     private final ArrayDeque<AbstractCommand> lastExecutedCommands = new ArrayDeque<>();
+    private final DataManager dataManager;
 
     public CommandManager(DataManager dataManager) {
-        initMap(dataManager);
+        this.dataManager = dataManager;
+        initMap();
     }
 
-    private void initMap(DataManager dataManager) {
+    private void initMap() {
         commands.put("add", new Add(dataManager));
         commands.put("add_if_min", new AddIfMin(dataManager));
         commands.put("clear", new Clear(dataManager));
-        commands.put("filter_less_than_car", new FilterLessThanCar(dataManager));
+        commands.put("filter_less_than_car", new FilterLessThanCar(dataManager)); //TODO hueva
         commands.put("head", new Head(dataManager));
         commands.put("info", new Info(dataManager));
         commands.put("print_descending", new PrintDescending(dataManager));
@@ -51,29 +53,33 @@ public class CommandManager {
     }
 
     public Object executeCommandFromRequest(CommandRequest requestFromClient) {
-        Object response;
-        if (commands.containsKey(requestFromClient.getCommandNameToSend().toLowerCase())) {
-            if (!requestFromClient.isServerRequest() && !commands.get(requestFromClient.getCommandNameToSend().toLowerCase()).isOnlyServerCommand()) {
-                try {
-                    appendCommandToHistory(requestFromClient.getCommandNameToSend());
-                    response = commands.get(requestFromClient.getCommandNameToSend()).execute(requestFromClient);
-                } catch (IllegalArgumentException e) {
-                    response = new CommandResponse(new ErrorMessage(e.getMessage()));
-                }
-            } else if (requestFromClient.isServerRequest()) {
-                try {
-                    appendCommandToHistory(requestFromClient.getCommandNameToSend());
-                    response =  commands.get(requestFromClient.getCommandNameToSend()).execute(requestFromClient);
-                } catch (IllegalArgumentException e) {
-                    response =  new CommandResponse(new ErrorMessage(e.getMessage()));
+        if (dataManager.loginUser(requestFromClient.getUserLogin(), requestFromClient.getUserPassword())) {
+            Object response;
+            if (commands.containsKey(requestFromClient.getCommandNameToSend().toLowerCase())) {
+                if (!requestFromClient.isServerRequest() && !commands.get(requestFromClient.getCommandNameToSend().toLowerCase()).isOnlyServerCommand()) {
+                    try {
+                        appendCommandToHistory(requestFromClient.getCommandNameToSend());
+                        response = commands.get(requestFromClient.getCommandNameToSend()).execute(requestFromClient);
+                    } catch (IllegalArgumentException e) {
+                        response = new CommandResponse(new ErrorMessage(e.getMessage()));
+                    }
+                } else if (requestFromClient.isServerRequest()) {
+                    try {
+                        appendCommandToHistory(requestFromClient.getCommandNameToSend());
+                        response = commands.get(requestFromClient.getCommandNameToSend()).execute(requestFromClient);
+                    } catch (IllegalArgumentException e) {
+                        response = new CommandResponse(new ErrorMessage(e.getMessage()));
+                    }
+                } else {
+                    response = new CommandResponse(new ErrorMessage("Такая команда недоступна"));
                 }
             } else {
-                response =  new CommandResponse(new ErrorMessage("Такая команда недоступна"));
+                response = new CommandResponse(new ErrorMessage("Такая команда отсутствует"));
             }
+            return response;
         } else {
-            response =  new CommandResponse(new ErrorMessage("Такая команда отсутствует"));
+            return new CommandResponse(new ErrorMessage("Произошла ошибка при проверке прав доступа"));
         }
-        return response;
     }
 
     public ArrayDeque<AbstractCommand> getLastExecutedCommands() {

@@ -1,7 +1,5 @@
 package kib.lab7.client;
 
-import kib.lab7.common.abstractions.RequestInterface;
-import kib.lab7.common.abstractions.ResponseInterface;
 import kib.lab7.common.util.client_server_communication.requests.CommandRequest;
 import kib.lab7.common.util.console_workers.CommandListener;
 import kib.lab7.common.util.ExecutableFileReader;
@@ -44,9 +42,10 @@ public class Application {
                 login.startAuthentication();
                 user = login.getLogin();
                 password = login.getPassword();
-                launchMainLoop();
-            } catch (NoSuchElementException ignored) {
+            } catch (NoSuchElementException e) {
+                return;
             }
+            launchMainLoop();
         }
     }
 

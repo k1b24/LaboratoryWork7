@@ -10,7 +10,6 @@ import kib.lab7.common.util.console_workers.ErrorMessage;
 import kib.lab7.common.util.console_workers.SuccessMessage;
 
 
-//TODO главный туду на завтра, научиться отделять одни интерфейсы от других и по разному создавать на них ответы
 public class RequestWorker {
 
     private final CommandManager commandManager;
@@ -28,12 +27,12 @@ public class RequestWorker {
         } else if (LoginRequest.class.equals(requestType)) {
             return workWithLoginRequest((LoginRequest) request);
         } else if (SignUpRequest.class.equals(requestType)) {
-            return WorkWithSignUpRequest((SignUpRequest) request);
+            return workWithSignUpRequest((SignUpRequest) request);
         }
         return null;
     }
 
-    private ResponseInterface WorkWithSignUpRequest(SignUpRequest request) {
+    private ResponseInterface workWithSignUpRequest(SignUpRequest request) {
         if (dataManager.createUser(request.getUserLogin(), request.getUserPassword())) {
             return new AuthenticationResponse(new SuccessMessage("Пользователь успешно создан"), true);
         } else {

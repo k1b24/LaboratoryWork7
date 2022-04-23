@@ -1,6 +1,5 @@
  package kib.lab7.common.util.client_server_communication;
 
-import kib.lab7.common.abstractions.RequestInterface;
 import kib.lab7.common.entities.HumanBeing;
 import kib.lab7.common.entities.enums.Mood;
 import kib.lab7.common.util.StringToTypeConverter;

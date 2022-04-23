@@ -6,7 +6,6 @@ import kib.lab7.common.entities.enums.Mood;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.PriorityQueue;
 import java.util.stream.Collectors;
 
@@ -15,7 +14,7 @@ import java.util.stream.Collectors;
  */
 public class CollectionManager {
 
-    private PriorityQueue<HumanBeing> humanQueue = new PriorityQueue<>();
+    private final PriorityQueue<HumanBeing> humanQueue = new PriorityQueue<>();
     private final LocalDate initializationDate;
 
     public CollectionManager() {
@@ -37,10 +36,12 @@ public class CollectionManager {
     public long getHumanIdByAnyMoodAndUserName(Mood mood, String user) {
         long id = 0;
         for (HumanBeing human : humanQueue) {
-            if (human.getMood() == null && human.getAuthor().equals(user)) {
-                id = human.getId();
-            } else if (human.getMood().equals(mood) && human.getAuthor().equals(user)) {
-                id = human.getId();
+            if (human.getAuthor().equals(user)) {
+                if (human.getMood() == null) {
+                    id = human.getId();
+                } else if (human.getMood().equals(mood)) {
+                    id = human.getId();
+                }
             }
         }
         return id;
@@ -56,7 +57,7 @@ public class CollectionManager {
     }
 
     public void fillWithArray(ArrayList<HumanBeing> arrayOfPeople) {
-        humanQueue.addAll(arrayOfPeople );
+        humanQueue.addAll(arrayOfPeople);
     }
 
     public HumanBeing returnHead() {
@@ -67,10 +68,6 @@ public class CollectionManager {
         ArrayList<HumanBeing> descendingList = getSortedArrayListFromQueue();
         Collections.reverse(descendingList);
         return descendingList;
-    }
-
-    public ArrayList<Long> getIDs() {
-        return (ArrayList<Long>) humanQueue.stream().map(HumanBeing::getId).collect(Collectors.toList());
     }
 
     public ArrayList<HumanBeing> filterByCarSpeed(int speed) {

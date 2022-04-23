@@ -20,10 +20,6 @@ public class    DataManager {
         return collectionManager;
     }
 
-    public DBManager getDBManager() {
-        return dbManager;
-    }
-
     public boolean addHumanBeing(HumanBeing human) {
         long id = dbManager.addHumanBeingToDB(human);
         if (id == -1) {

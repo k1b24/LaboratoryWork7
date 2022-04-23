@@ -8,11 +8,6 @@ import java.util.ArrayList;
  */
 public abstract class AbstractFileReader {
 
-    /**
-     * Абстрактный метод инициализации файла
-     * @param fileName имя файла
-     * @throws FileNotFoundException
-     */
     public abstract void initializeFile(String fileName) throws FileNotFoundException;
 
     /**

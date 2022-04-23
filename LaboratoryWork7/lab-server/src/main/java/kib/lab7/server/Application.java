@@ -4,8 +4,6 @@ import kib.lab7.common.abstractions.RequestInterface;
 import kib.lab7.common.abstractions.ResponseInterface;
 import kib.lab7.common.entities.HumanBeing;
 import kib.lab7.common.util.console_workers.ErrorMessage;
-import kib.lab7.common.util.client_server_communication.requests.CommandRequest;
-import kib.lab7.common.util.client_server_communication.responses.CommandResponse;
 import kib.lab7.common.util.console_workers.SuccessMessage;
 import kib.lab7.server.db_utils.DBFiller;
 import kib.lab7.server.utils.Config;
@@ -23,9 +21,9 @@ public class Application {
 
     private static final int MAX_PORT_VALUE = 65535;
     private ConnectionHandlerServer connectionHandlerServer;
-    private final ConsoleListenerThread consoleListenerThread = new ConsoleListenerThread();
+    //private final ConsoleListenerThread consoleListenerThread = new ConsoleListenerThread();
     private final Scanner scanner = new Scanner(System.in);
-    DataManager dataManager = new DataManager();
+    private final DataManager dataManager = new DataManager();
 
     /**
      * Публичный метод, запускающий работу серверного приложения
@@ -46,7 +44,7 @@ public class Application {
                 Config.getTextSender().printMessage(new ErrorMessage("Не удалось открыть канал для прослушивания"));
                 return;
             }
-            consoleListenerThread.start();
+            //consoleListenerThread.start();
             launchMainLoop();
         }
     }
@@ -104,10 +102,6 @@ public class Application {
         DBFiller dbFiller = new DBFiller();
         try {
             dataManager.getCollectionManager().fillWithArray((ArrayList<HumanBeing>) dbFiller.getArrayListOfHumanBeings());
-        } catch (NullPointerException e) {
-            Config.getTextSender().printMessage(new ErrorMessage("Пожалуйста проинциализируйте системную переменную HUMAN_INFO, "
-                    + "содержащую путь до файла с информацией о коллекции"));
-            return false;
         } catch (SQLException e) {
             e.printStackTrace();
             Config.getTextSender().printMessage(new ErrorMessage("Произошла ошибка при работе с базой данных"));

@@ -42,6 +42,7 @@ public class DBManager {
             statement.executeUpdate();
             return true;
         } catch (SQLException e) {
+            e.printStackTrace();
             Config.getTextSender().printMessage(new ErrorMessage("Произошла ошибка при работе с базой данных при добавлении нового пользователя"));
             return false;
         }
@@ -93,30 +94,7 @@ public class DBManager {
             long id = generateId();
             int paramCounter = 1;
             statement.setLong(paramCounter++, id);
-            statement.setString(paramCounter++, human.getName());
-            statement.setLong(paramCounter++, human.getCoordinates().getX());
-            statement.setFloat(paramCounter++, human.getCoordinates().getY());
-            statement.setDate(paramCounter++, Date.valueOf(LocalDate.now()));
-            statement.setBoolean(paramCounter++, human.isRealHero());
-            statement.setBoolean(paramCounter++, human.isHasToothpick());
-            statement.setInt(paramCounter++, human.getImpactSpeed());
-            if (human.getWeaponType() != null) {
-                statement.setString(paramCounter++, String.valueOf(human.getWeaponType()));
-            } else {
-                statement.setNull(paramCounter++, Types.VARCHAR);
-            }
-            if (human.getMood() != null) {
-                statement.setString(paramCounter++, String.valueOf(human.getMood()));
-            } else {
-                statement.setNull(paramCounter++, Types.VARCHAR);
-            }
-            if (human.getCar() != null) {
-                statement.setBoolean(paramCounter++, human.getCar().getCarCoolness());
-                statement.setInt(paramCounter++, human.getCar().getCarSpeed());
-            } else {
-                statement.setNull(paramCounter++, Types.BOOLEAN);
-                statement.setNull(paramCounter++, Types.INTEGER);
-            }
+            paramCounter = setHumanInfoToStatementFromNameToCar(statement, human, paramCounter);
             statement.setString(paramCounter, human.getAuthor());
             statement.executeUpdate();
             return id;
@@ -146,31 +124,7 @@ public class DBManager {
         String query = DBQueries.UPDATE_BY_ID_AND_USER.getQuery();
         try {
             PreparedStatement statement = dbConnector.getConnection().prepareStatement(query);
-            int paramCounter = 1;
-            statement.setString(paramCounter++, human.getName());
-            statement.setLong(paramCounter++, human.getCoordinates().getX());
-            statement.setFloat(paramCounter++, human.getCoordinates().getY());
-            statement.setDate(paramCounter++, Date.valueOf(LocalDate.now()));
-            statement.setBoolean(paramCounter++, human.isRealHero());
-            statement.setBoolean(paramCounter++, human.isHasToothpick());
-            statement.setInt(paramCounter++, human.getImpactSpeed());
-            if (human.getWeaponType() != null) {
-                statement.setString(paramCounter++, String.valueOf(human.getWeaponType()));
-            } else {
-                statement.setNull(paramCounter++, Types.VARCHAR);
-            }
-            if (human.getMood() != null) {
-                statement.setString(paramCounter++, String.valueOf(human.getMood()));
-            } else {
-                statement.setNull(paramCounter++, Types.VARCHAR);
-            }
-            if (human.getCar() != null) {
-                statement.setBoolean(paramCounter++, human.getCar().getCarCoolness());
-                statement.setInt(paramCounter++, human.getCar().getCarSpeed());
-            } else {
-                statement.setNull(paramCounter++, Types.BOOLEAN);
-                statement.setNull(paramCounter++, Types.INTEGER);
-            }
+            int paramCounter = setHumanInfoToStatementFromNameToCar(statement, human, 1);
             statement.setLong(paramCounter++, id);
             statement.setString(paramCounter, user);
             ResultSet rs = statement.executeQuery();
@@ -180,8 +134,38 @@ public class DBManager {
                 return 0;
             }
         } catch (SQLException e) {
-            Config.getTextSender().printMessage(new ErrorMessage("Возникла ошибка при обновленнии пользователя по ID"));
+            Config.getTextSender().printMessage(new ErrorMessage("Возникла ошибка при обновленнии человека по ID"));
             return -1;
         }
     }
+
+    private int setHumanInfoToStatementFromNameToCar(PreparedStatement statement, HumanBeing human, int paramCounterStart) throws SQLException {
+        int paramCounter = paramCounterStart;
+        statement.setString(paramCounter++, human.getName());
+        statement.setLong(paramCounter++, human.getCoordinates().getX());
+        statement.setFloat(paramCounter++, human.getCoordinates().getY());
+        statement.setDate(paramCounter++, Date.valueOf(LocalDate.now()));
+        statement.setBoolean(paramCounter++, human.isRealHero());
+        statement.setBoolean(paramCounter++, human.isHasToothpick());
+        statement.setInt(paramCounter++, human.getImpactSpeed());
+        if (human.getWeaponType() != null) {
+            statement.setString(paramCounter++, String.valueOf(human.getWeaponType()));
+        } else {
+            statement.setNull(paramCounter++, Types.VARCHAR);
+        }
+        if (human.getMood() != null) {
+            statement.setString(paramCounter++, String.valueOf(human.getMood()));
+        } else {
+            statement.setNull(paramCounter++, Types.VARCHAR);
+        }
+        if (human.getCar() != null) {
+            statement.setBoolean(paramCounter++, human.getCar().getCarCoolness());
+            statement.setInt(paramCounter++, human.getCar().getCarSpeed());
+        } else {
+            statement.setNull(paramCounter++, Types.BOOLEAN);
+            statement.setNull(paramCounter++, Types.INTEGER);
+        }
+        return paramCounter;
+    }
+
 }

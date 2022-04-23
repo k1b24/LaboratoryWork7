@@ -2,8 +2,8 @@ package kib.lab7.common.util.console_workers;
 
 public class InputedCommand {
 
-    private String name;
-    private String[] arguments;
+    private final String name;
+    private final String[] arguments;
 
     public InputedCommand(String name, String[] arguments) {
         this.name = name;
