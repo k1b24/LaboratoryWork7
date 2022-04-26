@@ -3,7 +3,9 @@ package kib.lab7.server.db_utils;
 import kib.lab7.common.entities.HumanBeing;
 import kib.lab7.common.util.console_workers.ErrorMessage;
 import kib.lab7.server.utils.Config;
+import kib.lab7.server.utils.MD2Encryptor;
 
+import java.security.NoSuchAlgorithmException;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -17,18 +19,22 @@ import java.util.List;
 public class DBManager {
 
     private final DBConnector dbConnector = new DBConnector();
+    private final MD2Encryptor encryptor = new MD2Encryptor();
+
 
     public boolean checkIfUserRegistered(String username, String password) {
         try {
             String query = DBQueries.FIND_USER_BY_LOG_AND_PASS.getQuery();
             PreparedStatement statement = dbConnector.getConnection().prepareStatement(query);
             statement.setString(1, username);
-            statement.setString(2, password);
+            statement.setString(2, encryptor.encrypt(password));
             ResultSet rs = statement.executeQuery();
             return rs.next();
         } catch (SQLException e) {
-            e.printStackTrace();
             Config.getTextSender().printMessage(new ErrorMessage("Произошла ошибка при работе с базой данных при проверке зарегистрированного пользователя"));
+            return false;
+        } catch (NoSuchAlgorithmException e) {
+            Config.getTextSender().printMessage(new ErrorMessage("Произошла ошибка при работе с базой данных при хешировании пароля"));
             return false;
         }
     }
@@ -38,12 +44,15 @@ public class DBManager {
             String query = DBQueries.ADD_USER.getQuery();
             PreparedStatement statement = dbConnector.getConnection().prepareStatement(query);
             statement.setString(1, userLogin);
-            statement.setString(2, userPassword);
+            statement.setString(2, encryptor.encrypt(userPassword));
             statement.executeUpdate();
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
             Config.getTextSender().printMessage(new ErrorMessage("Произошла ошибка при работе с базой данных при добавлении нового пользователя"));
+            return false;
+        } catch (NoSuchAlgorithmException e) {
+            Config.getTextSender().printMessage(new ErrorMessage("Произошла ошибка при работе с базой данных при хешировании пароля"));
             return false;
         }
     }

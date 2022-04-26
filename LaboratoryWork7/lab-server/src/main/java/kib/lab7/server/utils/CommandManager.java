@@ -39,7 +39,7 @@ public class CommandManager {
         commands.put("add", new Add(dataManager));
         commands.put("add_if_min", new AddIfMin(dataManager));
         commands.put("clear", new Clear(dataManager));
-        commands.put("filter_less_than_car", new FilterLessThanCar(dataManager)); //TODO hueva
+        commands.put("filter_less_than_car", new FilterLessThanCar(dataManager));
         commands.put("head", new Head(dataManager));
         commands.put("info", new Info(dataManager));
         commands.put("print_descending", new PrintDescending(dataManager));
