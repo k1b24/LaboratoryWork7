@@ -3,6 +3,8 @@ package kib.lab7.client;
 import kib.lab7.common.abstractions.RequestInterface;
 import kib.lab7.common.abstractions.ResponseInterface;
 import kib.lab7.common.util.client_server_communication.Serializer;
+import kib.lab7.common.util.client_server_communication.requests.CommandRequest;
+import kib.lab7.common.util.client_server_communication.requests.LoginRequest;
 
 import java.io.IOException;
 import java.net.DatagramPacket;
@@ -29,7 +31,6 @@ public class ConnectionHandlerClient {
     }
 
     public void sendRequest(RequestInterface request) throws IOException {
-        request.getType();
         request.setClientInfo(InetAddress.getLocalHost().toString() + ":" + datagramSocket.getLocalPort());
         ByteBuffer byteBuffer = Serializer.serializeRequest(request);
         byte[] bufferToSend = byteBuffer.array();

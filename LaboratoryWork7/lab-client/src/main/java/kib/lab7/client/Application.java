@@ -61,7 +61,7 @@ public class Application {
                     && userInputedCommand.getArguments().length == 1) {
                 executeScript(userInputedCommand.getArguments());
             } else {
-                if (sendRequest(userInputedCommand)) {
+                if (sendCommandRequst(userInputedCommand)) {
                     recieveResponse();
                 }
             }
@@ -106,7 +106,7 @@ public class Application {
         }
     }
 
-    private boolean sendRequest(InputedCommand inputedCommand) {
+    private boolean sendCommandRequst(InputedCommand inputedCommand) {
         RequestCreator requestCreator = new RequestCreator(textSender);
         CommandRequest request = requestCreator.createRequestFromInputedCommand(inputedCommand, this.user, this.password);
         if (request == null) {
@@ -150,7 +150,7 @@ public class Application {
             ArrayList<InputedCommand> commandsFromFile = fileReader.getInfoFromFile();
             for (InputedCommand command : commandsFromFile) {
                 if (!"execute_script".equalsIgnoreCase(command.getName())) {
-                    if (sendRequest(command)) {
+                    if (sendCommandRequst(command)) {
                         recieveResponse();
                     }
                 } else {

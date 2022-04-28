@@ -21,7 +21,7 @@ public class Application {
 
     private static final int MAX_PORT_VALUE = 65535;
     private ConnectionHandlerServer connectionHandlerServer;
-    //private final ConsoleListenerThread consoleListenerThread = new ConsoleListenerThread();
+    private final ConsoleListenerThread consoleListenerThread = new ConsoleListenerThread();
     private final Scanner scanner = new Scanner(System.in);
     private final DataManager dataManager = new DataManager();
 
@@ -30,6 +30,13 @@ public class Application {
      * Заполняет коллекцию и вводит с консоли порт, на котором будет слушать данные с клиента
      */
     public void launchApplication() {
+        try {
+            dataManager.getDbManager().initializeDB();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Config.getTextSender().printMessage(new ErrorMessage("Не удалось создать таблицы в базе данных"));
+            return;
+        }
         boolean fillingResult = fillCollection();
         if (fillingResult) {
             try {
@@ -44,7 +51,7 @@ public class Application {
                 Config.getTextSender().printMessage(new ErrorMessage("Не удалось открыть канал для прослушивания"));
                 return;
             }
-            //consoleListenerThread.start();
+            consoleListenerThread.start();
             launchMainLoop();
         }
     }

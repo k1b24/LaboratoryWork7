@@ -21,6 +21,17 @@ public class DBManager {
     private final DBConnector dbConnector = new DBConnector();
     private final MD2Encryptor encryptor = new MD2Encryptor();
 
+    public void initializeDB() throws SQLException {
+        String idSequenceCreationQuery = DBQueries.CREATE_SEQUENCE.getQuery();
+        String userTableCreationQuery = DBQueries.CREATE_USERS_TABLE.getQuery();
+        String humanTableCreationQuery = DBQueries.CREATE_HUMAN_TABLE.getQuery();
+        PreparedStatement idSequenceStatement = dbConnector.getConnection().prepareStatement(idSequenceCreationQuery);
+        PreparedStatement userTableStatement = dbConnector.getConnection().prepareStatement(userTableCreationQuery);
+        PreparedStatement humanTableStatement = dbConnector.getConnection().prepareStatement(humanTableCreationQuery);
+        idSequenceStatement.execute();
+        userTableStatement.execute();
+        humanTableStatement.execute();
+    }
 
     public boolean checkIfUserRegistered(String username, String password) {
         try {
