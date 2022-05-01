@@ -17,30 +17,30 @@ public enum DBQueries {
 
     FIND_USER_BY_LOG_AND_PASS("SELECT FROM s335106users WHERE username=? AND password=?"),
 
-    CREATE_HUMAN_TABLE("CREATE TABLE IF NOT EXISTS s335106HumanBeings (" +
-            "id bigint PRIMARY KEY DEFAULT (nextval('ids'))," +
-            "name varchar(255) NOT NULL CHECK(name<>'')," +
-            "x bigint NOT NULL CHECK(x > -759)," +
-            "y real NOT NULL," +
-            "creationdate date NOT NULL DEFAULT(current_date)," +
-            "realhero boolean NOT NULL," +
-            "hastoothpick boolean NOT NULL," +
-            "impactspeed int CHECK(impactSpeed < 712)," +
-            "weapontype varchar(11) CHECK(" +
-            "weapontype='HAMMER' OR weapontype='AXE' OR " +
-            "weapontype='RIFLE' OR weapontype='KNIFE' " +
-            "OR weapontype='MACHINE_GUN')," +
-            "mood varchar(6) CHECK(" +
-            "mood='APATHY' OR mood='CALM' OR mood='RAGE')," +
-            "carcoolness boolean," +
-            "carspeed int," +
-            "author varchar(255) REFERENCES s335106Users (username)" +
-            ")"),
+    CREATE_HUMAN_TABLE("CREATE TABLE IF NOT EXISTS s335106HumanBeings ("
+            + "id bigint PRIMARY KEY DEFAULT (nextval('ids')),"
+            + "name varchar(255) NOT NULL CHECK(name<>''),"
+            + "x bigint NOT NULL CHECK(x > -759),"
+            + "y real NOT NULL,"
+            + "creationdate date NOT NULL DEFAULT(current_date),"
+            + "realhero boolean NOT NULL,"
+            + "hastoothpick boolean NOT NULL,"
+            + "impactspeed int CHECK(impactSpeed < 712),"
+            + "weapontype varchar(11) CHECK("
+            + "weapontype='HAMMER' OR weapontype='AXE' OR "
+            + "weapontype='RIFLE' OR weapontype='KNIFE' "
+            + "OR weapontype='MACHINE_GUN'),"
+            + "mood varchar(6) CHECK("
+            + "mood='APATHY' OR mood='CALM' OR mood='RAGE'),"
+            + "carcoolness boolean,"
+            + "carspeed int,"
+            + "author varchar(255) REFERENCES s335106Users (username)"
+            + ")"),
 
-    CREATE_USERS_TABLE("CREATE TABLE IF NOT EXISTS s335106Users(" +
-            "username varchar(255) PRIMARY KEY NOT NULL CHECK (TRIM(username) <> '')," +
-            "password varchar(128) DEFAULT(null)" +
-            ")"),
+    CREATE_USERS_TABLE("CREATE TABLE IF NOT EXISTS s335106Users("
+            + "username varchar(255) PRIMARY KEY NOT NULL CHECK (TRIM(username) <> ''),"
+            + "password varchar(128) DEFAULT(null)"
+            + ")"),
 
     CREATE_SEQUENCE("CREATE SEQUENCE IF NOT EXISTS ids START 1");
 

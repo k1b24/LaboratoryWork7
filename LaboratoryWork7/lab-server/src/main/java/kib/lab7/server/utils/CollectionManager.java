@@ -19,9 +19,9 @@ public class CollectionManager {
 
     private final PriorityQueue<HumanBeing> humanQueue = new PriorityQueue<>();
     private final LocalDate initializationDate;
-    ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
-    Lock readLock = readWriteLock.readLock();
-    Lock writeLock = readWriteLock.writeLock();
+    private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock();
+    private final Lock readLock = readWriteLock.readLock();
+    private final Lock writeLock = readWriteLock.writeLock();
 
     public CollectionManager() {
         initializationDate = LocalDate.now();

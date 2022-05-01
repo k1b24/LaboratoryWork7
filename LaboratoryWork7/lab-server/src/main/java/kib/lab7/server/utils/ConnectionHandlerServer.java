@@ -1,6 +1,5 @@
 package kib.lab7.server.utils;
 
-import kib.lab7.common.abstractions.RequestInterface;
 import kib.lab7.common.abstractions.ResponseInterface;
 import kib.lab7.common.util.client_server_communication.Serializer;
 
@@ -12,25 +11,31 @@ import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
+
+import static java.nio.channels.SelectionKey.OP_READ;
 
 public class ConnectionHandlerServer {
 
     private static final int SELECTION_TIME = 1;
     private final Selector selector;
     private final DatagramChannel datagramChannel;
-    private SocketAddress socketAddress;
+    private final SocketAddress serverSocketAddress;
+    private final Map<DatagramChannel, SocketAddress> channelsMap = new HashMap<>();
 
     public ConnectionHandlerServer(int port) throws IOException {
+        serverSocketAddress = new InetSocketAddress(port);
         datagramChannel = DatagramChannel.open();
         selector = Selector.open();
-        datagramChannel.socket().bind(new InetSocketAddress(port));
+        datagramChannel.socket().bind(serverSocketAddress);
         datagramChannel.configureBlocking(false);
-        datagramChannel.register(selector, SelectionKey.OP_READ);
+        datagramChannel.register(selector, OP_READ);
     }
 
-    public RequestInterface listen() throws ClassNotFoundException, IOException {
+    public AcceptedRequest listen() throws ClassNotFoundException, IOException {
         if (selector.select(SELECTION_TIME) == 0) {
             return null;
         }
@@ -39,22 +44,23 @@ public class ConnectionHandlerServer {
         while (iterator.hasNext()) {
             SelectionKey key = iterator.next();
             iterator.remove();
-            if (key.isReadable()) {
-                ByteBuffer packet = ByteBuffer.allocate(datagramChannel.socket().getReceiveBufferSize());
-                socketAddress = datagramChannel.receive(packet);
-                ((Buffer) packet).flip();
-                byte[] bytes = new byte[packet.remaining()];
-                packet.get(bytes);
-                return Serializer.deserializeRequest(bytes);
+            if (key.isValid()) {
+                if (key.isReadable()) {
+                    ByteBuffer packet = ByteBuffer.allocate(datagramChannel.socket().getReceiveBufferSize());
+                    SocketAddress socketAddress = datagramChannel.receive(packet);
+                    ((Buffer) packet).flip();
+                    byte[] bytes = new byte[packet.remaining()];
+                    packet.get(bytes);
+                    return new AcceptedRequest(Serializer.deserializeRequest(bytes), socketAddress);
+                }
             }
         }
         return null;
     }
 
-    public String sendResponse(ResponseInterface response) throws IOException {
+    public void sendResponse(ResponseInterface response, SocketAddress socketAddress) throws IOException {
         ByteBuffer bufferToSend = Serializer.serializeResponse(response);
         datagramChannel.send(bufferToSend, socketAddress);
-        return socketAddress.toString();
     }
 
     public void closeServer() throws IOException {

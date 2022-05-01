@@ -1,11 +1,10 @@
 package kib.lab7.server;
 
-import kib.lab7.common.abstractions.RequestInterface;
-import kib.lab7.common.abstractions.ResponseInterface;
 import kib.lab7.common.entities.HumanBeing;
 import kib.lab7.common.util.console_workers.ErrorMessage;
 import kib.lab7.common.util.console_workers.SuccessMessage;
 import kib.lab7.server.db_utils.DBFiller;
+import kib.lab7.server.utils.AcceptedRequest;
 import kib.lab7.server.utils.Config;
 import kib.lab7.server.utils.ConnectionHandlerServer;
 import kib.lab7.server.utils.DataManager;
@@ -16,14 +15,19 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class Application {
 
+    private static final int THREADS = Runtime.getRuntime().availableProcessors() / 3;
     private static final int MAX_PORT_VALUE = 65535;
     private ConnectionHandlerServer connectionHandlerServer;
     private final ConsoleListenerThread consoleListenerThread = new ConsoleListenerThread();
     private final Scanner scanner = new Scanner(System.in);
     private final DataManager dataManager = new DataManager();
+    private final ExecutorService executorService = Executors.newFixedThreadPool(THREADS);
 
     /**
      * Публичный метод, запускающий работу серверного приложения
@@ -60,19 +64,21 @@ public class Application {
         RequestWorker requestWorker = new RequestWorker(dataManager);
         while (Config.isWorking()) {
             try {
-                RequestInterface requestFromClient = connectionHandlerServer.listen();
-                if (requestFromClient != null) {
-                    ResponseInterface responseToClient = requestWorker.getResponse(requestFromClient);
-                    try {
-                        connectionHandlerServer.sendResponse(responseToClient);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        Config.getTextSender().printMessage(new ErrorMessage("Не удалось отправить ответ клиенту"));
-                    }
+                AcceptedRequest acceptedRequest = connectionHandlerServer.listen();
+                if (acceptedRequest != null) {
+                    System.out.println(THREADS);
+                    CompletableFuture.supplyAsync(acceptedRequest::getRecievedRequest, executorService)
+                            .thenApplyAsync(requestWorker::getResponse, executorService)
+                            .thenAcceptAsync(response -> {
+                                try {
+                                    connectionHandlerServer.sendResponse(response, acceptedRequest.getSocketAddress());
+                                } catch (IOException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            }, executorService);
                 }
             } catch (IOException e) {
                 Config.getTextSender().printMessage(new ErrorMessage("Не удалось получить пакет с клиента"));
-                e.printStackTrace();
             } catch (ClassNotFoundException e) {
                 Config.getTextSender().printMessage(new ErrorMessage("Клиент прислал пакет, который невозможно десериализовать"));
             }

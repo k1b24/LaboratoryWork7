@@ -12,6 +12,9 @@ public class DBConnector {
         String host = System.getenv("DB_HOST");
         String name = System.getenv("DB_NAME");
         String dbHost = "jdbc:postgresql://" + host + ":5432/" + name;
+        System.out.println(dbHost);
+        System.out.println(login);
+        System.out.println(password);
         return DriverManager.getConnection(dbHost, login, password);
     }
 }

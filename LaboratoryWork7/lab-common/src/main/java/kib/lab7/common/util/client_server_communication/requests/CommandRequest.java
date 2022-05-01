@@ -95,7 +95,7 @@ public class CommandRequest implements Serializable, RequestInterface {
     @Override
     public String toString() {
         return "Имя команды: " + commandNameToSend
-                + (humanToSend == null ? "" : " / Информация о человеке: " + humanToSend.toString())
+                + (humanToSend == null ? "" : " / Информация о человеке: " + humanToSend)
                 + (numberArgumentToSend == null ? "" : " / Числовой аргумент = " + numberArgumentToSend)
                 + (moodArgumentToSend == null ? "" : " / Настроение: " + moodArgumentToSend);
     }
