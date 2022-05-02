@@ -21,7 +21,7 @@ import java.util.concurrent.Executors;
 
 public class Application {
 
-    private static final int THREADS = Runtime.getRuntime().availableProcessors() / 3;
+    private static final int THREADS = Runtime.getRuntime().availableProcessors();
     private static final int MAX_PORT_VALUE = 65535;
     private ConnectionHandlerServer connectionHandlerServer;
     private final ConsoleListenerThread consoleListenerThread = new ConsoleListenerThread();
@@ -37,7 +37,6 @@ public class Application {
         try {
             dataManager.getDbManager().initializeDB();
         } catch (SQLException e) {
-            e.printStackTrace();
             Config.getTextSender().printMessage(new ErrorMessage("Не удалось создать таблицы в базе данных"));
             return;
         }
@@ -66,14 +65,13 @@ public class Application {
             try {
                 AcceptedRequest acceptedRequest = connectionHandlerServer.listen();
                 if (acceptedRequest != null) {
-                    System.out.println(THREADS);
                     CompletableFuture.supplyAsync(acceptedRequest::getRecievedRequest, executorService)
                             .thenApplyAsync(requestWorker::getResponse, executorService)
                             .thenAcceptAsync(response -> {
                                 try {
                                     connectionHandlerServer.sendResponse(response, acceptedRequest.getSocketAddress());
                                 } catch (IOException e) {
-                                    throw new RuntimeException(e);
+                                    Config.getTextSender().printMessage(new ErrorMessage("Не удалось отправить ответ клиенту"));
                                 }
                             }, executorService);
                 }
@@ -84,6 +82,7 @@ public class Application {
             }
         }
         try {
+            executorService.shutdown();
             connectionHandlerServer.closeServer();
         } catch (IOException e) {
             Config.getTextSender().printMessage(new ErrorMessage("При закрытии сервера произошла ошибка, "
@@ -116,7 +115,6 @@ public class Application {
         try {
             dataManager.getCollectionManager().fillWithArray((ArrayList<HumanBeing>) dbFiller.getArrayListOfHumanBeings());
         } catch (SQLException e) {
-            e.printStackTrace();
             Config.getTextSender().printMessage(new ErrorMessage("Произошла ошибка при работе с базой данных"));
             return false;
         }

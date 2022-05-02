@@ -11,9 +11,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import static java.nio.channels.SelectionKey.OP_READ;
@@ -24,7 +22,6 @@ public class ConnectionHandlerServer {
     private final Selector selector;
     private final DatagramChannel datagramChannel;
     private final SocketAddress serverSocketAddress;
-    private final Map<DatagramChannel, SocketAddress> channelsMap = new HashMap<>();
 
     public ConnectionHandlerServer(int port) throws IOException {
         serverSocketAddress = new InetSocketAddress(port);

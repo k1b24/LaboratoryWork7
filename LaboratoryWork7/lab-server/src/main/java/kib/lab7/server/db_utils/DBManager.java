@@ -6,6 +6,7 @@ import kib.lab7.server.utils.Config;
 import kib.lab7.server.utils.MD2Encryptor;
 
 import java.security.NoSuchAlgorithmException;
+import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -22,21 +23,23 @@ public class DBManager {
     private final MD2Encryptor encryptor = new MD2Encryptor();
 
     public void initializeDB() throws SQLException {
+        Connection connection = dbConnector.getConnection();
         String idSequenceCreationQuery = DBQueries.CREATE_SEQUENCE.getQuery();
         String userTableCreationQuery = DBQueries.CREATE_USERS_TABLE.getQuery();
         String humanTableCreationQuery = DBQueries.CREATE_HUMAN_TABLE.getQuery();
-        PreparedStatement idSequenceStatement = dbConnector.getConnection().prepareStatement(idSequenceCreationQuery);
-        PreparedStatement userTableStatement = dbConnector.getConnection().prepareStatement(userTableCreationQuery);
-        PreparedStatement humanTableStatement = dbConnector.getConnection().prepareStatement(humanTableCreationQuery);
+        PreparedStatement idSequenceStatement = connection.prepareStatement(idSequenceCreationQuery);
+        PreparedStatement userTableStatement = connection.prepareStatement(userTableCreationQuery);
+        PreparedStatement humanTableStatement = connection.prepareStatement(humanTableCreationQuery);
         idSequenceStatement.execute();
         userTableStatement.execute();
         humanTableStatement.execute();
+        connection.close();
     }
 
     public synchronized boolean checkIfUserRegistered(String username, String password) {
-        try {
+        try (Connection connection = dbConnector.getConnection()) {
             String query = DBQueries.FIND_USER_BY_LOG_AND_PASS.getQuery();
-            PreparedStatement statement = dbConnector.getConnection().prepareStatement(query);
+            PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, username);
             statement.setString(2, encryptor.encrypt(password));
             ResultSet rs = statement.executeQuery();
@@ -51,9 +54,9 @@ public class DBManager {
     }
 
     public synchronized boolean registerNewUser(String userLogin, String userPassword) {
-        try {
+        try (Connection connection = dbConnector.getConnection()) {
             String query = DBQueries.ADD_USER.getQuery();
-            PreparedStatement statement = dbConnector.getConnection().prepareStatement(query);
+            PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, userLogin);
             statement.setString(2, encryptor.encrypt(userPassword));
             statement.executeUpdate();
@@ -70,8 +73,8 @@ public class DBManager {
 
     public synchronized Long[] clearByUserName(String userLogin) {
         String query = DBQueries.CLEAR_ALL_HUMAN_BEINGS_BY_USER.getQuery();
-        try {
-            PreparedStatement statement = dbConnector.getConnection().prepareStatement(query);
+        try (Connection connection = dbConnector.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, userLogin);
             ResultSet rs = statement.executeQuery();
             List<Long> result = new ArrayList<>();
@@ -90,8 +93,8 @@ public class DBManager {
 
     public synchronized long clearByIdAndUserName(long id, String userName) {
         String query = DBQueries.DELETE_HUMAN_BEING_BY_ID.getQuery();
-        try {
-            PreparedStatement statement = dbConnector.getConnection().prepareStatement(query);
+        try (Connection connection = dbConnector.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(query);
             statement.setLong(1, id);
             statement.setString(2, userName);
             ResultSet rs = statement.executeQuery();
@@ -108,9 +111,9 @@ public class DBManager {
     }
 
     public synchronized long addHumanBeingToDB(HumanBeing human) {
-        try {
+        try (Connection connection = dbConnector.getConnection()) {
             String query = DBQueries.ADD_HUMAN_BEING_TO_DB.getQuery();
-            PreparedStatement statement = dbConnector.getConnection().prepareStatement(query);
+            PreparedStatement statement = connection.prepareStatement(query);
             long id = generateId();
             int paramCounter = 1;
             statement.setLong(paramCounter++, id);
@@ -126,8 +129,8 @@ public class DBManager {
     }
 
     private synchronized long generateId() {
-        try {
-            Statement statement = dbConnector.getConnection().createStatement();
+        try (Connection connection = dbConnector.getConnection()) {
+            Statement statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(DBQueries.GENERATE_NEXT_ID.getQuery());
             if (rs.next()) {
                 return rs.getInt("nextval");
@@ -142,8 +145,8 @@ public class DBManager {
 
     public synchronized long updateByIdAndUser(HumanBeing human, long id, String user) {
         String query = DBQueries.UPDATE_BY_ID_AND_USER.getQuery();
-        try {
-            PreparedStatement statement = dbConnector.getConnection().prepareStatement(query);
+        try (Connection connection = dbConnector.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement(query);
             int paramCounter = setHumanInfoToStatementFromNameToCar(statement, human, 1);
             statement.setLong(paramCounter++, id);
             statement.setString(paramCounter, user);

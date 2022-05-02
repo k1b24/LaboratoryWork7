@@ -6,15 +6,13 @@ import java.sql.SQLException;
 
 public class DBConnector {
 
+    private static final String LOGIN = System.getenv("DB_LOGIN");
+    private static final String PASSWORD = System.getenv("DB_PASS");
+    private static final String HOST = System.getenv("DB_HOST");
+    private static final String NAME = System.getenv("DB_NAME");
+    private static final String DB_HOST = "jdbc:postgresql://" + HOST + ":5432/" + NAME;
+
     public Connection getConnection() throws SQLException {
-        String login = System.getenv("DB_LOGIN");
-        String password = System.getenv("DB_PASS");
-        String host = System.getenv("DB_HOST");
-        String name = System.getenv("DB_NAME");
-        String dbHost = "jdbc:postgresql://" + host + ":5432/" + name;
-        System.out.println(dbHost);
-        System.out.println(login);
-        System.out.println(password);
-        return DriverManager.getConnection(dbHost, login, password);
+        return DriverManager.getConnection(DB_HOST, LOGIN, PASSWORD);
     }
 }

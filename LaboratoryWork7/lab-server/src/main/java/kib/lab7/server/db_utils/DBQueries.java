@@ -39,7 +39,7 @@ public enum DBQueries {
 
     CREATE_USERS_TABLE("CREATE TABLE IF NOT EXISTS s335106Users("
             + "username varchar(255) PRIMARY KEY NOT NULL CHECK (TRIM(username) <> ''),"
-            + "password varchar(128) DEFAULT(null)"
+            + "password char(128) DEFAULT(null)"
             + ")"),
 
     CREATE_SEQUENCE("CREATE SEQUENCE IF NOT EXISTS ids START 1");
