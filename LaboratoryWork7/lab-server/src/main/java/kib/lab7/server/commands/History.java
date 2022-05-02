@@ -21,7 +21,7 @@ public class History extends AbstractCommand {
 
     @Override
     public Object execute(CommandRequest request) {
-        ArrayDeque<AbstractCommand> listToReturn = commandManager.getLastExecutedCommands();
+        ArrayDeque<AbstractCommand> listToReturn = (ArrayDeque<AbstractCommand>) commandManager.getLastExecutedCommands();
         return new CommandResponse(new SuccessMessage(listToReturn.stream()
                 .map(AbstractCommand::getName)
                 .collect(Collectors.joining("\n"))));

@@ -22,12 +22,14 @@ import kib.lab7.server.commands.Update;
 import java.util.ArrayDeque;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class CommandManager {
 
     private static final int AMOUNT_OF_COMMANDS_TO_SAVE = 10;
     private final Map<String, AbstractCommand> commands = new HashMap<>();
-    private final ArrayDeque<AbstractCommand> lastExecutedCommands = new ArrayDeque<>();
+    private final Queue<AbstractCommand> lastExecutedCommands = new ConcurrentLinkedQueue<>();
     private final DataManager dataManager;
 
     public CommandManager(DataManager dataManager) {
@@ -82,14 +84,14 @@ public class CommandManager {
         }
     }
 
-    public ArrayDeque<AbstractCommand> getLastExecutedCommands() {
+    public Queue<AbstractCommand> getLastExecutedCommands() {
         return lastExecutedCommands;
     }
 
     private void appendCommandToHistory(String name) {
-        lastExecutedCommands.addFirst(commands.get(name));
+        lastExecutedCommands.add(commands.get(name));
         if (lastExecutedCommands.size() == AMOUNT_OF_COMMANDS_TO_SAVE + 1) {
-            lastExecutedCommands.pollLast();
+            lastExecutedCommands.poll();
         }
     }
 }
