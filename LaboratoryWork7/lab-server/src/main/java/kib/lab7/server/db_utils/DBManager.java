@@ -36,7 +36,7 @@ public class DBManager {
         connection.close();
     }
 
-    public synchronized boolean checkIfUserRegistered(String username, String password) {
+    public boolean checkIfUserRegistered(String username, String password) {
         try (Connection connection = dbConnector.getConnection()) {
             String query = DBQueries.FIND_USER_BY_LOG_AND_PASS.getQuery();
             PreparedStatement statement = connection.prepareStatement(query);
@@ -53,7 +53,7 @@ public class DBManager {
         }
     }
 
-    public synchronized boolean registerNewUser(String userLogin, String userPassword) {
+    public boolean registerNewUser(String userLogin, String userPassword) {
         try (Connection connection = dbConnector.getConnection()) {
             String query = DBQueries.ADD_USER.getQuery();
             PreparedStatement statement = connection.prepareStatement(query);
@@ -71,7 +71,7 @@ public class DBManager {
         }
     }
 
-    public synchronized Long[] clearByUserName(String userLogin) {
+    public Long[] clearByUserName(String userLogin) {
         String query = DBQueries.CLEAR_ALL_HUMAN_BEINGS_BY_USER.getQuery();
         try (Connection connection = dbConnector.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(query);
@@ -91,7 +91,7 @@ public class DBManager {
 
     }
 
-    public synchronized long clearByIdAndUserName(long id, String userName) {
+    public long clearByIdAndUserName(long id, String userName) {
         String query = DBQueries.DELETE_HUMAN_BEING_BY_ID.getQuery();
         try (Connection connection = dbConnector.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(query);
@@ -110,7 +110,7 @@ public class DBManager {
         }
     }
 
-    public synchronized long addHumanBeingToDB(HumanBeing human) {
+    public long addHumanBeingToDB(HumanBeing human) {
         try (Connection connection = dbConnector.getConnection()) {
             String query = DBQueries.ADD_HUMAN_BEING_TO_DB.getQuery();
             PreparedStatement statement = connection.prepareStatement(query);
@@ -128,7 +128,7 @@ public class DBManager {
         }
     }
 
-    private synchronized long generateId() {
+    private long generateId() {
         try (Connection connection = dbConnector.getConnection()) {
             Statement statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(DBQueries.GENERATE_NEXT_ID.getQuery());
@@ -143,7 +143,7 @@ public class DBManager {
         }
     }
 
-    public synchronized long updateByIdAndUser(HumanBeing human, long id, String user) {
+    public long updateByIdAndUser(HumanBeing human, long id, String user) {
         String query = DBQueries.UPDATE_BY_ID_AND_USER.getQuery();
         try (Connection connection = dbConnector.getConnection()) {
             PreparedStatement statement = connection.prepareStatement(query);
@@ -162,7 +162,7 @@ public class DBManager {
         }
     }
 
-    private synchronized int setHumanInfoToStatementFromNameToCar(PreparedStatement statement, HumanBeing human, int paramCounterStart) throws SQLException {
+    private int setHumanInfoToStatementFromNameToCar(PreparedStatement statement, HumanBeing human, int paramCounterStart) throws SQLException {
         int paramCounter = paramCounterStart;
         statement.setString(paramCounter++, human.getName());
         statement.setLong(paramCounter++, human.getCoordinates().getX());

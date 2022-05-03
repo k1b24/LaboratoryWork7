@@ -1,1 +1,12 @@
-2022/05/03 15:16 INFO HV000001: Hibernate Validator 6.0.10.Final
+2022/05/03 15:31 INFO Вызван метод: launchApplication
+2022/05/03 15:31 INFO HV000001: Hibernate Validator 6.0.10.Final
+2022/05/03 15:31 INFO Обращение к менеджеру коллекции: fillWithArray / Аргументы: [[3. Valera, X: 222, Y: 22.0, CREATION DATE: 2022-04-27, REAL HERO: true, HAS TOOTHPICK: false, IMPACT SPEED: 22, WEAPON TYPE: AXE, MOOD: RAGE, CAR INFO: CAR COOLNESS: false CAR SPEED: 222, Author: k1b ]]
+2022/05/03 15:31 INFO Коллекция успешно заполнена из файла
+2022/05/03 15:31 INFO Вызван метод: launchMainLoop
+2022/05/03 15:31 INFO Обращение к менеджеру коллекции: getSortedArrayListFromQueue / Аргументы: []
+2022/05/03 15:31 INFO Исполнена команда: show
+2022/05/03 15:31 INFO Обращение к менеджеру коллекции: returnHead / Аргументы: []
+2022/05/03 15:31 INFO Исполнена команда: head
+2022/05/03 15:31 INFO Обращение к менеджеру коллекции: getInfoAboutCollection / Аргументы: []
+2022/05/03 15:31 INFO Исполнена команда: info
+2022/05/03 15:31 INFO Исполнена команда: help
