@@ -5,6 +5,7 @@ import kib.lab7.common.util.console_workers.ErrorMessage;
 import kib.lab7.common.util.console_workers.SuccessMessage;
 import kib.lab7.server.db_utils.DBFiller;
 import kib.lab7.server.utils.AcceptedRequest;
+import kib.lab7.server.utils.ByteBufferDeserializerSupplier;
 import kib.lab7.server.utils.Config;
 import kib.lab7.server.utils.ConnectionHandlerServer;
 import kib.lab7.server.utils.DataManager;
@@ -65,7 +66,8 @@ public class Application {
             try {
                 AcceptedRequest acceptedRequest = connectionHandlerServer.listen();
                 if (acceptedRequest != null) {
-                    CompletableFuture.supplyAsync(acceptedRequest::getRecievedRequest, executorService)
+                    ByteBufferDeserializerSupplier byteBufferDeserializerSupplier = new ByteBufferDeserializerSupplier(acceptedRequest.getRecievedBytes());
+                    CompletableFuture.supplyAsync(byteBufferDeserializerSupplier, executorService)
                             .thenApplyAsync(requestWorker::getResponse, executorService)
                             .thenAcceptAsync(response -> {
                                 try {

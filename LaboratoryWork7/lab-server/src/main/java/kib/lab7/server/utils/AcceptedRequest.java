@@ -1,25 +1,25 @@
 package kib.lab7.server.utils;
 
-import kib.lab7.common.abstractions.RequestInterface;
 
 import java.net.SocketAddress;
+import java.nio.ByteBuffer;
 
 public class AcceptedRequest {
 
-    private final RequestInterface recievedRequest;
+    private final ByteBuffer recievedBytes;
     private final SocketAddress socketAddress;
 
 
-    public AcceptedRequest(RequestInterface recievedRequest, SocketAddress socketAddress) {
-        this.recievedRequest = recievedRequest;
+    public AcceptedRequest(ByteBuffer recievedBytes, SocketAddress socketAddress) {
+        this.recievedBytes = recievedBytes;
         this.socketAddress = socketAddress;
-    }
-
-    public RequestInterface getRecievedRequest() {
-        return recievedRequest;
     }
 
     public SocketAddress getSocketAddress() {
         return socketAddress;
+    }
+
+    public ByteBuffer getRecievedBytes() {
+        return recievedBytes;
     }
 }

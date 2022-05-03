@@ -6,7 +6,6 @@ import kib.lab7.common.util.client_server_communication.Serializer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.DatagramChannel;
 import java.nio.channels.SelectionKey;
@@ -22,6 +21,8 @@ public class ConnectionHandlerServer {
     private final Selector selector;
     private final DatagramChannel datagramChannel;
     private final SocketAddress serverSocketAddress;
+    private final Serializer serializer = new Serializer();
+
 
     public ConnectionHandlerServer(int port) throws IOException {
         serverSocketAddress = new InetSocketAddress(port);
@@ -45,10 +46,7 @@ public class ConnectionHandlerServer {
                 if (key.isReadable()) {
                     ByteBuffer packet = ByteBuffer.allocate(datagramChannel.socket().getReceiveBufferSize());
                     SocketAddress socketAddress = datagramChannel.receive(packet);
-                    ((Buffer) packet).flip();
-                    byte[] bytes = new byte[packet.remaining()];
-                    packet.get(bytes);
-                    return new AcceptedRequest(Serializer.deserializeRequest(bytes), socketAddress);
+                    return new AcceptedRequest(packet, socketAddress);
                 }
             }
         }
@@ -56,7 +54,7 @@ public class ConnectionHandlerServer {
     }
 
     public void sendResponse(ResponseInterface response, SocketAddress socketAddress) throws IOException {
-        ByteBuffer bufferToSend = Serializer.serializeResponse(response);
+        ByteBuffer bufferToSend = serializer.serializeResponse(response);
         datagramChannel.send(bufferToSend, socketAddress);
     }
 

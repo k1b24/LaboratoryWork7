@@ -18,6 +18,7 @@ public class ConnectionHandlerClient {
     private int serverPort;
     private final DatagramSocket datagramSocket;
     private final InetAddress serverAddress;
+    private final Serializer serializer = new Serializer();
 
     public ConnectionHandlerClient(String address) throws UnknownHostException, SocketException {
         datagramSocket = new DatagramSocket();
@@ -30,7 +31,7 @@ public class ConnectionHandlerClient {
 
     public void sendRequest(RequestInterface request) throws IOException {
         request.setClientInfo(InetAddress.getLocalHost().toString() + ":" + datagramSocket.getLocalPort());
-        ByteBuffer byteBuffer = Serializer.serializeRequest(request);
+        ByteBuffer byteBuffer = serializer.serializeRequest(request);
         byte[] bufferToSend = byteBuffer.array();
         DatagramPacket datagramPacket = new DatagramPacket(bufferToSend, bufferToSend.length, serverAddress, serverPort);
         datagramSocket.send(datagramPacket);
@@ -43,7 +44,7 @@ public class ConnectionHandlerClient {
         DatagramPacket dpFromServer = new DatagramPacket(byteBuf, byteBuf.length);
         datagramSocket.receive(dpFromServer);
         byte[] bytesFromServer = dpFromServer.getData();
-        return Serializer.deserializeResponse(bytesFromServer);
+        return serializer.deserializeResponse(bytesFromServer);
     }
 
 }

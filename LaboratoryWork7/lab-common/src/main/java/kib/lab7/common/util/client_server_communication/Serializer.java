@@ -12,10 +12,10 @@ import java.nio.ByteBuffer;
 
 public final class Serializer {
 
-    private Serializer() {
+    public Serializer() {
     }
 
-    public static ByteBuffer serializeResponse(ResponseInterface response) throws IOException {
+    public ByteBuffer serializeResponse(ResponseInterface response) throws IOException {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bytes);
         oos.writeObject(response);
@@ -26,7 +26,7 @@ public final class Serializer {
         return bufferToSend;
     }
 
-    public static ByteBuffer serializeRequest(RequestInterface request) throws IOException {
+    public ByteBuffer serializeRequest(RequestInterface request) throws IOException {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         ObjectOutputStream oos = new ObjectOutputStream(bytes);
         oos.writeObject(request);
@@ -37,7 +37,7 @@ public final class Serializer {
         return bufferToSend;
     }
 
-    public static RequestInterface deserializeRequest(byte[] bytes) throws IOException, ClassNotFoundException {
+    public RequestInterface deserializeRequest(byte[] bytes) throws IOException, ClassNotFoundException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
         ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
         RequestInterface request = (RequestInterface) objectInputStream.readObject();
@@ -46,7 +46,7 @@ public final class Serializer {
         return request;
     }
 
-    public static ResponseInterface deserializeResponse(byte[] bytes) throws IOException, ClassNotFoundException {
+    public ResponseInterface deserializeResponse(byte[] bytes) throws IOException, ClassNotFoundException {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
         ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
         ResponseInterface response = (ResponseInterface) objectInputStream.readObject();
