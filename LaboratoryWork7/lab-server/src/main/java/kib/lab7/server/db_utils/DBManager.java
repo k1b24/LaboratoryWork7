@@ -23,23 +23,26 @@ public class DBManager {
     private final MD2Encryptor encryptor = new MD2Encryptor();
 
     public void initializeDB() throws SQLException {
-        Connection connection = dbConnector.getConnection();
         String idSequenceCreationQuery = DBQueries.CREATE_SEQUENCE.getQuery();
         String userTableCreationQuery = DBQueries.CREATE_USERS_TABLE.getQuery();
         String humanTableCreationQuery = DBQueries.CREATE_HUMAN_TABLE.getQuery();
-        PreparedStatement idSequenceStatement = connection.prepareStatement(idSequenceCreationQuery);
-        PreparedStatement userTableStatement = connection.prepareStatement(userTableCreationQuery);
-        PreparedStatement humanTableStatement = connection.prepareStatement(humanTableCreationQuery);
-        idSequenceStatement.execute();
-        userTableStatement.execute();
-        humanTableStatement.execute();
-        connection.close();
+        try (Connection connection = dbConnector.getConnection();
+             PreparedStatement idSequenceStatement = connection.prepareStatement(idSequenceCreationQuery);
+             PreparedStatement userTableStatement = connection.prepareStatement(userTableCreationQuery);
+             PreparedStatement humanTableStatement = connection.prepareStatement(humanTableCreationQuery)
+        ) {
+            idSequenceStatement.execute();
+            userTableStatement.execute();
+            humanTableStatement.execute();
+        }
     }
 
     public boolean checkIfUserRegistered(String username, String password) {
-        try (Connection connection = dbConnector.getConnection()) {
-            String query = DBQueries.FIND_USER_BY_LOG_AND_PASS.getQuery();
-            PreparedStatement statement = connection.prepareStatement(query);
+        String query = DBQueries.FIND_USER_BY_LOG_AND_PASS.getQuery();
+
+        try (Connection connection = dbConnector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)
+        ) {
             statement.setString(1, username);
             statement.setString(2, encryptor.encrypt(password));
             ResultSet rs = statement.executeQuery();
@@ -54,9 +57,11 @@ public class DBManager {
     }
 
     public boolean registerNewUser(String userLogin, String userPassword) {
-        try (Connection connection = dbConnector.getConnection()) {
-            String query = DBQueries.ADD_USER.getQuery();
-            PreparedStatement statement = connection.prepareStatement(query);
+        String query = DBQueries.ADD_USER.getQuery();
+
+        try (Connection connection = dbConnector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)
+        ) {
             statement.setString(1, userLogin);
             statement.setString(2, encryptor.encrypt(userPassword));
             statement.executeUpdate();
@@ -73,8 +78,9 @@ public class DBManager {
 
     public Long[] clearByUserName(String userLogin) {
         String query = DBQueries.CLEAR_ALL_HUMAN_BEINGS_BY_USER.getQuery();
-        try (Connection connection = dbConnector.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(query);
+        try (Connection connection = dbConnector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)
+        ) {
             statement.setString(1, userLogin);
             ResultSet rs = statement.executeQuery();
             List<Long> result = new ArrayList<>();
@@ -93,8 +99,9 @@ public class DBManager {
 
     public long clearByIdAndUserName(long id, String userName) {
         String query = DBQueries.DELETE_HUMAN_BEING_BY_ID.getQuery();
-        try (Connection connection = dbConnector.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(query);
+        try (Connection connection = dbConnector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)
+        ) {
             statement.setLong(1, id);
             statement.setString(2, userName);
             ResultSet rs = statement.executeQuery();
@@ -111,9 +118,10 @@ public class DBManager {
     }
 
     public long addHumanBeingToDB(HumanBeing human) {
-        try (Connection connection = dbConnector.getConnection()) {
-            String query = DBQueries.ADD_HUMAN_BEING_TO_DB.getQuery();
-            PreparedStatement statement = connection.prepareStatement(query);
+        String query = DBQueries.ADD_HUMAN_BEING_TO_DB.getQuery();
+        try (Connection connection = dbConnector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)
+        ) {
             long id = generateId();
             int paramCounter = 1;
             statement.setLong(paramCounter++, id);
@@ -129,8 +137,9 @@ public class DBManager {
     }
 
     private long generateId() {
-        try (Connection connection = dbConnector.getConnection()) {
-            Statement statement = connection.createStatement();
+        try (Connection connection = dbConnector.getConnection();
+             Statement statement = connection.createStatement()
+        ) {
             ResultSet rs = statement.executeQuery(DBQueries.GENERATE_NEXT_ID.getQuery());
             if (rs.next()) {
                 return rs.getInt("nextval");
@@ -145,8 +154,9 @@ public class DBManager {
 
     public long updateByIdAndUser(HumanBeing human, long id, String user) {
         String query = DBQueries.UPDATE_BY_ID_AND_USER.getQuery();
-        try (Connection connection = dbConnector.getConnection()) {
-            PreparedStatement statement = connection.prepareStatement(query);
+        try (Connection connection = dbConnector.getConnection();
+             PreparedStatement statement = connection.prepareStatement(query)
+        ) {
             int paramCounter = setHumanInfoToStatementFromNameToCar(statement, human, 1);
             statement.setLong(paramCounter++, id);
             statement.setString(paramCounter, user);
