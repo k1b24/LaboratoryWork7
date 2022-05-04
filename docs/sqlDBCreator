@@ -1,0 +1,29 @@
+CREATE SEQUENCE IF NOT EXISTS ids START 1
+
+CREATE TABLE IF NOT EXISTS s335106HumanBeings (
+	id bigint PRIMARY KEY DEFAULT (nextval('ids')),
+	name varchar(255) NOT NULL CHECK(name<>''),
+	x bigint NOT NULL CHECK(x > -759),
+	y smallfloat NOT NULL,
+	creationDate date NOT NULL DEFAULT(current_date),
+	realHero boolean NOT NULL,
+	hasToothpick boolean NOT NULL,
+	impactSpeed int CHECK(impactSpeed < 712),
+	weaponType varchar(11) CHECK(
+				weaponType='HAMMER' OR weaponType='AXE' OR
+				weaponType='RIFLE' OR weaponType='KNIFE'
+				OR weaponType='MACHINE_GUN'
+			),
+	mood varchar(6) CHECK(
+				mood='APATHY' OR mood='CALM' OR mood='RAGE'
+			),	
+	carCoolness boolean,
+	carSpeed int,
+	author varchar(255) REFERENCES s335106Users (username)
+	)
+
+CREATE TABLE IF NOT EXISTS s335106Users(
+	username varchar(255) PRIMARY KEY NOT NULL CHECK (TRIM(username) <> ''),
+	password varchar(128) DEFAULT(null)
+	)
+

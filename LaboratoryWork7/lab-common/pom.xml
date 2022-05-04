@@ -3,8 +3,8 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>kib.lab6</groupId>
-        <artifactId>lab6</artifactId>
+        <groupId>kib.lab7</groupId>
+        <artifactId>lab7</artifactId>
         <version>1.0</version>
     </parent>
     <artifactId>lab-common</artifactId>
